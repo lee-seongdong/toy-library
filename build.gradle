@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.0-M3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.2.0'
+
+    runtimeOnly 'com.h2database:h2'
+
+    // platform: BOM (Bill of Materials)을 가져오는 Gradle 함수
+    // BOM: 여러 라이브러리의 호환되는 버전들을 미리 정의해놓은 메타데이터 파일
+    testImplementation(platform('org.junit:junit-bom:6.0.0'))
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform() // junit-platform-launcher를 사용하기 위한 설정
+}
