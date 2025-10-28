@@ -13,119 +13,116 @@
 목적에 따라 세부 설계 기법으로 구분
 - [전략적 설계](전략적%20설계.md): 무엇을 해결할 것인가?
 - [전술적 설계](./전술적%20설계.md): 어떻게 구현할 것인가?
-- [아키텍처 설계](아키텍처%20설계.md): 시스템을 어떤 구조로 설계할 것인가?
----
----
----
 
-## ⚡ **5단계: 도메인 이벤트와 비동기 처리**
-### 5.1 도메인 이벤트(Domain Event)
-#### 5.1.1 도메인 이벤트의 개념과 장점
-#### 5.1.2 이벤트 설계 원칙
-#### 5.1.3 이벤트 발행과 구독 구현
+## 2. 안티패턴
+### 2.1. 빈약한 도메인 모델(Anemic Domain Model)
+문제: 로직이 없고, getter와 setter만 존재하는 도메인
+```java
+public class Loan {
+    private Long id;
+    private Book book;
+    private LocalDate dueDate;
+    // getter/setter만 존재
+}
 
-### 5.2 이벤트 스토밍(Event Storming)
-#### 5.2.1 이벤트 스토밍 프로세스
-#### 5.2.2 도메인 이벤트 발견하기
-#### 5.2.3 애그리게이트 경계 찾기
+// 로직이 Service에 집중
+public class LoanService {
+    public void extendLoan(Loan loan, int days) {
+        loan.setDueDate(loan.getDueDate().plusDays(days));
+    }
+}
+```
 
-### 5.3 사가 패턴(Saga Pattern)
-#### 5.3.1 분산 트랜잭션 문제
-#### 5.3.2 코레오그래피 vs 오케스트레이션
-#### 5.3.3 보상 트랜잭션 설계
+해결: 풍부한 도메인 모델로 전환. 도메인에 비즈니스 로직을 배치
+```java
+public class Loan {
+    private Long id;
+    private Book book;
+    private LocalDate dueDate;
+    
+    public void extend(int days) {
+        if (this.isOverdue()) {
+            throw new CannotExtendOverdueLoanException();
+        }
+        this.dueDate = this.dueDate.plusDays(days);
+    }
+}
+```
 
 
-## 📋 **7단계: 애플리케이션 서비스와 유스케이스**
-### 7.1 애플리케이션 서비스
-#### 7.1.1 애플리케이션 서비스의 역할과 책임
-#### 7.1.2 도메인 서비스와의 차이점
-#### 7.1.3 트랜잭션 관리
-#### 7.1.4 보안과 권한 처리
+### 2.2. 과도한 애그리거트
+문제: 너무 큰 애그리거트. 성능 저하 및 동시성 문제 발생
+```java
+// Member가 모든 Loan을 직접 관리
+public class Member {
+    private List<Loan> loans; // 수백개의 대출 기록
+    private List<Reservation> reservations;
+    private List<Review> reviews;
+}
+```
 
-### 7.2 명세(Specification) 패턴
-#### 7.2.1 비즈니스 규칙 캡슐화
-#### 7.2.2 조합 가능한 명세 설계
-#### 7.2.3 쿼리 명세와 검증 명세
+해결: 애그리거트 경계를 작게 유지 (ID참조)
+```java
+public class Member {
+    private Long id;
+    // 다른 애그리거트는 ID로만 참조
+}
 
-## 🔄 **8단계: CQRS와 이벤트 소싱**
-### 8.1 CQRS (Command Query Responsibility Segregation)
-#### 8.1.1 명령과 조회 분리의 필요성
-#### 8.1.2 읽기 모델과 쓰기 모델 설계
-#### 8.1.3 CQRS 구현 패턴
-#### 8.1.4 CQRS의 장단점
+public class Loan {
+    private Long memberId; // Member 애그리거트 참조
+    private Long bookId;   // Book 애그리거트 참조
+}
+```
 
-### 8.2 이벤트 소싱(Event Sourcing)
-#### 8.2.1 이벤트 소싱의 개념과 장점
-#### 8.2.2 이벤트 스토어 설계
-#### 8.2.3 스냅샷과 성능 최적화
-#### 8.2.4 CQRS와 이벤트 소싱 결합
+### 2.3. 잘못된 컨텍스트 경계
+-문제: 모든것을 하나의 컨텍스트에 배치하여 복잡도 증가
+```
+library/ (모든 것이 하나)
+  ├── Book (대출 정보 + 카탈로그 정보 혼재)
+  └── ...
+```
 
-## 🌐 **9단계: 마이크로서비스와 DDD**
-### 9.1 바운디드 컨텍스트와 서비스 경계
-#### 9.1.1 컨텍스트별 서비스 분리
-#### 9.1.2 데이터베이스 분리 전략
-#### 9.1.3 서비스 간 통신 패턴
+해결: 유비쿼터스 언어가 다른 의미로 작용되는 지점에서 컨텍스트 분리
+```
+library/
+├── loan/       (대출 컨텍스트)
+│   └── Book (대출 상태, 반납일)
+└── catalog/    (카탈로그 컨텍스트)
+    └── Book (제목, 저자, 출판사)
+```
 
-### 9.2 분산 시스템에서의 데이터 일관성
-#### 9.2.1 최종 일관성(Eventual Consistency)
-#### 9.2.2 분산 트랜잭션 대안
-#### 9.2.3 데이터 동기화 전략
+### 2.4. 기술 중심 설계
+문제: JPA 엔티티 부터 설계하여 도메인 로직이 기술에 종속
+```java
+@Entity
+@Table(name = "loans")
+public class Loan {
+    @Id 
+    @GeneratedValue
+    private Long id;
+    // JPA 제약에 맞춰 설계
+}
+```
+해결: 도메인 모델을 먼저 설계한 후, 영속성 매핑
+```java
+// 1단계: 순수 도메인 모델 설계
+public class Loan {
+    private LoanId id;
+    private Book book;
+    
+    public void extend(int days) { ... }
+}
 
-## 🛠️ **10단계: DDD 모델링 기법**
-### 10.1 도메인 스토리텔링(Domain Storytelling)
-#### 10.1.1 스토리텔링 프로세스
-#### 10.1.2 액터와 워크 오브젝트 식별
-#### 10.1.3 도메인 프로세스 시각화
+// 2단계: 인프라에서 매핑
+@Entity
+public class LoanJpaEntity {
+    // JPA 매핑은 인프라 계층에서
+}
+```
 
-### 10.2 예제 매핑(Example Mapping)
-#### 10.2.1 규칙과 예제 발견
-#### 10.2.2 질문과 가정 관리
-#### 10.2.3 사용자 스토리 정제
 
-### 10.3 사용자 스토리 매핑
-#### 10.3.1 사용자 여정 매핑
-#### 10.3.2 백로그 우선순위 결정
-#### 10.3.3 MVP 범위 설정
-
-## ⚠️ **11단계: DDD 안티패턴과 함정**
-### 11.1 빈약한 도메인 모델(Anemic Domain Model)
-#### 11.1.1 안티패턴 식별하기
-#### 11.1.2 풍부한 도메인 모델로 전환
-#### 11.1.3 행위 중심 설계
-
-### 11.2 기타 주요 안티패턴
-#### 11.2.1 스마트 UI 안티패턴
-#### 11.2.2 트랜잭션 스크립트 남용
-#### 11.2.3 과도한 엔지니어링
-
-## 🚀 **12단계: DDD 실무 적용**
-### 12.1 DDD 도입 전략
-#### 12.1.1 조직의 준비도 평가
-#### 12.1.2 점진적 도입 방법
-#### 12.1.3 팀 교육과 문화 변화
-
-### 12.2 레거시 시스템에 DDD 적용
-#### 12.2.1 스트랭글러 패턴
-#### 12.2.2 바운디드 컨텍스트 점진적 분리
-#### 12.2.3 레거시 통합 전략
-
-### 12.3 성공 사례와 실패 사례
-#### 12.3.1 성공 요인 분석
-#### 12.3.2 실패 원인과 교훈
-#### 12.3.3 베스트 프랙티스
-
-## 🔧 **13단계: DDD 구현과 도구**
-### 13.1 Java/Spring 환경에서의 DDD
-#### 13.1.1 Spring Boot와 DDD 아키텍처
-#### 13.1.2 JPA와 애그리게이트 매핑
-#### 13.1.3 Spring 이벤트와 도메인 이벤트
-
-### 13.2 DDD 지원 라이브러리와 프레임워크
-#### 13.2.1 Axon Framework
-#### 13.2.2 EventStore
-#### 13.2.3 기타 유용한 라이브러리
-
-### 13.3 모델링과 문서화 도구
-#### 13.3.1 Context Mapper
-#### 13.3.2 PlantUML과 도메인 모델링
-#### 13.3.3 협업 도구 활용
+## 3. 도구
+- Context Mapper: DDD 모델링 도구
+- PlantUML: 텍스트기반 UML
+- jMolecules: 도메인 모델 표현을 위한 어노테이션을 제공하는 라이브러리
+- Spring Modulith: 모듈리스 애플리케이션 구축을 위한 Spring boot 툴킷
