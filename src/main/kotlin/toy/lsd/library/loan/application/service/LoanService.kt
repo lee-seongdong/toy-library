@@ -4,78 +4,62 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import toy.lsd.library.loan.domain.model.Loan
 import toy.lsd.library.loan.domain.model.LoanId
-import toy.lsd.library.loan.infrastructure.persistence.mapper.LoanMapper
-import toy.lsd.library.loan.infrastructure.persistence.LoanRepository
+import toy.lsd.library.loan.domain.repository.LoanRepository
+import toy.lsd.library.shared.domain.model.ISBN
+import toy.lsd.library.shared.domain.model.MemberId
 
 @Service
 @Transactional
 open class LoanService(
-    private val loanRepository: LoanRepository,
-    private val loanMapper: LoanMapper
+    private val loanRepository: LoanRepository
 ) {
-    fun createLoan(memberId: String, bookIsbn: String): Loan {
+    fun createLoan(memberId: MemberId, bookIsbn: ISBN): Loan {
         val loan = Loan.create(memberId, bookIsbn)
-        val entity = loanMapper.toEntity(loan)
-        val savedEntity = loanRepository.save(entity)
-        return loanMapper.toDomain(savedEntity)
+        return loanRepository.save(loan)
     }
 
     fun borrowBook(loanId: LoanId): Loan {
-        val entity = loanRepository.findById(loanId.value)
+        val loan = loanRepository.findById(loanId)
             .orElseThrow { IllegalArgumentException("Loan not found: ${loanId.value}") }
 
-        val loan = loanMapper.toDomain(entity)
         val borrowedLoan = loan.borrow()
-
-        val updatedEntity = loanMapper.toEntity(borrowedLoan)
-        val savedEntity = loanRepository.save(updatedEntity)
-        return loanMapper.toDomain(savedEntity)
+        return loanRepository.save(borrowedLoan)
     }
 
     fun returnBook(loanId: LoanId): Loan {
-        val entity = loanRepository.findById(loanId.value)
+        val loan = loanRepository.findById(loanId)
             .orElseThrow { IllegalArgumentException("Loan not found: ${loanId.value}") }
 
-        val loan = loanMapper.toDomain(entity)
         val returnedLoan = loan.returnBook()
 
-        val updatedEntity = loanMapper.toEntity(returnedLoan)
-        val savedEntity = loanRepository.save(updatedEntity)
-        return loanMapper.toDomain(savedEntity)
+        return loanRepository.save(returnedLoan)
     }
 
     fun extendLoan(loanId: LoanId, days: Int = 3): Loan {
-        val entity = loanRepository.findById(loanId.value)
+        val loan = loanRepository.findById(loanId)
             .orElseThrow { IllegalArgumentException("Loan not found: ${loanId.value}") }
 
-        val loan = loanMapper.toDomain(entity)
         val extendedLoan = loan.extend(days)
-
-        val updatedEntity = loanMapper.toEntity(extendedLoan)
-        val savedEntity = loanRepository.save(updatedEntity)
-        return loanMapper.toDomain(savedEntity)
+        return loanRepository.save(extendedLoan)
     }
 
     @Transactional(readOnly = true)
     fun findById(loanId: LoanId): Loan? {
-        return loanRepository.findById(loanId.value)
-            .map { loanMapper.toDomain(it) }
+        return loanRepository.findById(loanId)
             .orElse(null)
     }
 
     @Transactional(readOnly = true)
     open fun findByMemberId(memberId: String): List<Loan> {
-        val entities = loanRepository.findByMemberId(memberId)
-        return loanMapper.toDomainList(entities)
+        return loanRepository.findByMemberId(memberId)
     }
 
     @Transactional(readOnly = true)
     open fun findAll(): List<Loan> {
-        val entities = loanRepository.findAll()
-        return loanMapper.toDomainList(entities)
+        return loanRepository.findAll()
     }
 
     fun deleteLoan(loanId: LoanId) {
-        loanRepository.deleteById(loanId.value)
+        loanRepository.deleteById(loanId)
     }
 }

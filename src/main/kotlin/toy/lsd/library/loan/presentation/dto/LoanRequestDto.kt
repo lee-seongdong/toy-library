@@ -1,4 +1,4 @@
-package toy.lsd.library.loan.application.dto
+package toy.lsd.library.loan.presentation.dto
 
 import toy.lsd.library.loan.domain.model.LoanStatus
 import java.time.LocalDate

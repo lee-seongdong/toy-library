@@ -1,4 +1,4 @@
-package toy.lsd.library.loan.infrastructure.persistence
+package toy.lsd.library.loan.infrastructure.persistence.repository
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -8,14 +8,16 @@ import toy.lsd.library.loan.infrastructure.persistence.entity.LoanEntity
 import java.time.LocalDate
 
 @Repository
-interface LoanRepository: JpaRepository<LoanEntity, String> {
+interface LoanJpaRepository : JpaRepository<LoanEntity, String> {
     fun findByMemberId(memberId: String): List<LoanEntity>
 
-    @Query("""
+    @Query(
+        """
        SELECT l 
          FROM LoanEntity l 
         WHERE l.dueDate < :now 
           AND l.status = 'ON_LOAN' 
-    """)
+    """
+    )
     fun findOverdueLoans(@Param("now") now: LocalDate): List<LoanEntity>
 }

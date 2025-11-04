@@ -1,9 +1,11 @@
 package toy.lsd.library.loan.presentation
 
 import org.springframework.web.bind.annotation.*
-import toy.lsd.library.loan.application.dto.CreateLoanRequest
+import toy.lsd.library.loan.presentation.dto.CreateLoanRequest
 import toy.lsd.library.loan.application.service.LoanService
 import toy.lsd.library.loan.domain.model.LoanId
+import toy.lsd.library.shared.domain.model.ISBN
+import toy.lsd.library.shared.domain.model.MemberId
 
 @RestController
 @RequestMapping("/api/loans")
@@ -12,7 +14,11 @@ class LoanController(
 ) {
     @PostMapping
     fun createLoan(@RequestBody createLoanRequest: CreateLoanRequest): String {
-        val createdLoan = loanService.createLoan(createLoanRequest.memberId, createLoanRequest.bookIsbn)
+        val memberId = MemberId(createLoanRequest.memberId)
+        val isbn = ISBN(createLoanRequest.bookIsbn)
+
+        val createdLoan = loanService.createLoan(memberId, isbn)
+
         return createdLoan.id.value
     }
 

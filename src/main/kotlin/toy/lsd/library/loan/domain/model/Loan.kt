@@ -1,18 +1,20 @@
 package toy.lsd.library.loan.domain.model
 
+import toy.lsd.library.shared.domain.model.ISBN
+import toy.lsd.library.shared.domain.model.MemberId
 import java.time.LocalDateTime
 
 data class Loan(
     val id: LoanId,
-    val memberId: String,  // 외부 애그리거트 참조 (ID만)
-    val bookIsbn: String,  // 외부 애그리거트 참조 (ID만)
+    val memberId: MemberId,  // 외부 애그리거트 참조 (ID만)
+    val bookIsbn: ISBN,  // 외부 애그리거트 참조 (ID만)
     val period: LoanPeriod,
     val status: LoanStatus,
     val borrowedAt: LocalDateTime? = null,
     val returnedAt: LocalDateTime? = null
 ) {
     companion object {
-        fun create(memberId: String, bookIsbn: String): Loan {
+        fun create(memberId: MemberId, bookIsbn: ISBN): Loan {
             return Loan(
                 id = LoanId.generate(),
                 memberId = memberId,
