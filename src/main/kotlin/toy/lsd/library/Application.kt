@@ -1,11 +1,14 @@
-package toy.lsd.library;
+package toy.lsd.library
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+
 
 @SpringBootApplication
-public class Application {
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+@EnableJpaRepositories
+open class Application
+
+fun main(args: Array<String>) {
+    runApplication<Application>(*args)
 }

@@ -1,0 +1,7 @@
+POST http://localhost:8080/api/loans
+Content-Type: application/json
+
+{
+  "memberId": "user1",
+  "bookIsbn": "book1"
+}
