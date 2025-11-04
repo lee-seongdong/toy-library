@@ -21,8 +21,8 @@ data class LoanResponse(
         fun from(loan: Loan): LoanResponse {
             return LoanResponse(
                 id = loan.id.value,
-                memberId = loan.memberId,
-                bookIsbn = loan.bookIsbn,
+                memberId = loan.memberId.value,
+                bookIsbn = loan.bookIsbn.value,
                 startDate = loan.period.startDate,
                 dueDate = loan.period.dueDate,
                 status = loan.status,

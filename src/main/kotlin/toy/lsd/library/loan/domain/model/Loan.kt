@@ -1,5 +1,9 @@
 package toy.lsd.library.loan.domain.model
 
+import toy.lsd.library.loan.domain.event.BookBorrowed
+import toy.lsd.library.loan.domain.event.LoanCreated
+import toy.lsd.library.shared.domain.event.DomainEvent
+import toy.lsd.library.shared.domain.event.HasDomainEvents
 import toy.lsd.library.shared.domain.model.ISBN
 import toy.lsd.library.shared.domain.model.MemberId
 import java.time.LocalDateTime
@@ -11,10 +15,18 @@ data class Loan(
     val period: LoanPeriod,
     val status: LoanStatus,
     val borrowedAt: LocalDateTime? = null,
-    val returnedAt: LocalDateTime? = null
-) {
+    val returnedAt: LocalDateTime? = null,
+    private val _domainEvents: List<DomainEvent> = emptyList()
+): HasDomainEvents {
+    override val domainEvents get() = _domainEvents
+
     companion object {
         fun create(memberId: MemberId, bookIsbn: ISBN): Loan {
+            val loanCreated = LoanCreated(
+                memberId = memberId.value,
+                isbn = bookIsbn.value,
+            )
+
             return Loan(
                 id = LoanId.generate(),
                 memberId = memberId,
@@ -22,7 +34,8 @@ data class Loan(
                 period = LoanPeriod.standardPeriod(),
                 status = LoanStatus.AVAILABLE,
                 borrowedAt = null,
-                returnedAt = null
+                returnedAt = null,
+                _domainEvents = listOf(loanCreated)
             )
         }
     }
@@ -31,9 +44,17 @@ data class Loan(
         if (this.status != LoanStatus.AVAILABLE) {
             throw IllegalStateException("Book is not available for loan")
         }
+
+        val bookBorrowed = BookBorrowed(
+            loanId = id.value,
+            memberId = memberId.value,
+            bookIsbn = bookIsbn.value,
+        )
+
         return this.copy(
             status = LoanStatus.ON_LOAN,
-            borrowedAt = LocalDateTime.now()
+            borrowedAt = LocalDateTime.now(),
+            _domainEvents = domainEvents + bookBorrowed
         )
     }
 
@@ -63,4 +84,6 @@ data class Loan(
         }
         return this.copy(status = LoanStatus.OVERDUE)
     }
+
+    fun eventCleared(): Loan = this.copy(_domainEvents = emptyList())
 }
