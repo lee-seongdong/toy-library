@@ -11,7 +11,7 @@ import java.time.LocalDate
 import java.util.*
 
 @Component
-class LoanRepositoryAdaptor(
+class LoanRepositoryAdapter(
     private val loanJpaRepository: LoanJpaRepository,
 ) : LoanRepository {
 
