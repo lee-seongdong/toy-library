@@ -1,4 +1,4 @@
-package toy.lsd.library.member.adaptor.notification
+package toy.lsd.library.member.adapter.notification
 
 import org.springframework.stereotype.Component
 import toy.lsd.library.member.domain.port.NotificationPort

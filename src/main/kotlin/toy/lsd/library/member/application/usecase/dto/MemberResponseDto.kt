@@ -1,4 +1,4 @@
-package toy.lsd.library.member.adaptor.web.dto
+package toy.lsd.library.member.application.usecase.dto
 
 import toy.lsd.library.member.domain.Member
 import toy.lsd.library.member.domain.MemberStatus

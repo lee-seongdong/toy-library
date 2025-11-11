@@ -1,4 +1,4 @@
-package toy.lsd.library.member.adaptor.persistence.entity
+package toy.lsd.library.member.adapter.persistence.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

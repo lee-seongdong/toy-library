@@ -1,4 +1,4 @@
-package toy.lsd.library.member.adaptor.web
+package toy.lsd.library.member.adapter.web
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -8,20 +8,20 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import toy.lsd.library.member.adaptor.web.dto.RegisterMemberRequest
-import toy.lsd.library.member.adaptor.web.dto.MemberResponseDto
-import toy.lsd.library.member.application.usecase.FindMemberUsecase
-import toy.lsd.library.member.application.usecase.ManageMemberUsecase
-import toy.lsd.library.member.application.usecase.RegisterMemberCommand
-import toy.lsd.library.member.application.usecase.RegisterMemberUsecase
+import toy.lsd.library.member.application.usecase.dto.RegisterMemberRequest
+import toy.lsd.library.member.application.usecase.dto.MemberResponseDto
+import toy.lsd.library.member.application.usecase.FindMemberUseCase
+import toy.lsd.library.member.application.usecase.ManageMemberUseCase
+import toy.lsd.library.member.application.usecase.RegisterMemberUseCase
+import toy.lsd.library.member.application.usecase.dto.RegisterMemberCommand
 import toy.lsd.library.shared.domain.model.MemberId
 
 @RestController
 @RequestMapping("/api/members")
 class MemberController(
-    private val registerMemberUsecase: RegisterMemberUsecase,
-    private val findMemberUsecase: FindMemberUsecase,
-    private val manageMemberUsecase: ManageMemberUsecase
+    private val registerMemberUsecase: RegisterMemberUseCase,
+    private val findMemberUsecase: FindMemberUseCase,
+    private val manageMemberUsecase: ManageMemberUseCase
 ) {
 
     @PostMapping

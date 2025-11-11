@@ -1,7 +1,7 @@
-package toy.lsd.library.member.adaptor.persistence.repository
+package toy.lsd.library.member.adapter.persistence.repository
 
 import org.springframework.data.jpa.repository.JpaRepository
-import toy.lsd.library.member.adaptor.persistence.entity.MemberEntity
+import toy.lsd.library.member.adapter.persistence.entity.MemberEntity
 
 interface MemberJpaRepository : JpaRepository<MemberEntity, String> {
     fun findByEmail(email: String): MemberEntity?

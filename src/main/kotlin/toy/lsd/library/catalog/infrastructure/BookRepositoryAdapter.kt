@@ -7,7 +7,7 @@ import toy.lsd.library.shared.domain.model.ISBN
 import java.util.Optional
 
 @Component
-class BookRepositoryAdaptor: BookRepository {
+class BookRepositoryAdapter: BookRepository {
     override fun findById(id: ISBN): Optional<Book> {
         TODO("Not yet implemented")
     }

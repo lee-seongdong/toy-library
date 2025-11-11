@@ -2,11 +2,11 @@ package toy.lsd.library.member.application.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import toy.lsd.library.member.adaptor.web.dto.MemberResponseDto
-import toy.lsd.library.member.application.usecase.FindMemberUsecase
-import toy.lsd.library.member.application.usecase.ManageMemberUsecase
-import toy.lsd.library.member.application.usecase.RegisterMemberCommand
-import toy.lsd.library.member.application.usecase.RegisterMemberUsecase
+import toy.lsd.library.member.application.usecase.FindMemberUseCase
+import toy.lsd.library.member.application.usecase.ManageMemberUseCase
+import toy.lsd.library.member.application.usecase.RegisterMemberUseCase
+import toy.lsd.library.member.application.usecase.dto.MemberResponseDto
+import toy.lsd.library.member.application.usecase.dto.RegisterMemberCommand
 import toy.lsd.library.member.domain.Email
 import toy.lsd.library.member.domain.Member
 import toy.lsd.library.member.domain.port.MemberRepository
@@ -18,7 +18,7 @@ import toy.lsd.library.shared.domain.model.MemberId
 class MemberApplicationService(
     private val memberRepository: MemberRepository,    // Outbound Port
     private val notificationPort: NotificationPort     // Outbound Port
-) : RegisterMemberUsecase, FindMemberUsecase, ManageMemberUsecase {
+) : RegisterMemberUseCase, FindMemberUseCase, ManageMemberUseCase {
 
     override fun register(command: RegisterMemberCommand): MemberResponseDto {
         // 비즈니스 규칙 검증

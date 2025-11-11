@@ -1,10 +1,10 @@
-package toy.lsd.library.member.adaptor.persistence
+package toy.lsd.library.member.adapter.persistence
 
 import org.springframework.stereotype.Component
 import toy.lsd.library.member.domain.Email
 import toy.lsd.library.member.domain.Member
-import toy.lsd.library.member.adaptor.persistence.entity.MemberEntity
-import toy.lsd.library.member.adaptor.persistence.repository.MemberJpaRepository
+import toy.lsd.library.member.adapter.persistence.entity.MemberEntity
+import toy.lsd.library.member.adapter.persistence.repository.MemberJpaRepository
 import toy.lsd.library.member.domain.port.MemberRepository
 import toy.lsd.library.shared.domain.model.MemberId
 

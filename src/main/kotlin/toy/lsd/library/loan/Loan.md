@@ -24,8 +24,3 @@
 │ Infrastructure  │     ← Infrastructure가 Domain의 Interface 구현
 └─────────────────┘
 ```
-
-## 특징
-- 낮은 복잡도
-- 빠른 개발
-- 도메인이 인프라에 의존할 가능성 존재. 
